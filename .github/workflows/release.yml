@@ -1,0 +1,30 @@
+name: Compile Latex and Release
+on:
+  push:
+    tags:
+      - "v*.*.*"
+jobs:
+  CompileAndRelease:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+      discussions: write
+    env:
+      pdf-name: IN2178-security-engineering-summary.pdf
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Get update and install TeXLive
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y texlive texlive-lang-german texlive-latex-extra
+      - name: Execute Make
+        run: make
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            ${{ env.pdf-name }}
+          generate_release_notes: true
+          fail_on_unmatched_files: true
